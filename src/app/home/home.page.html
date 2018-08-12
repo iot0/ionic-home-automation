@@ -1,7 +1,21 @@
+<ion-header>
+  <ion-toolbar color='primary'>
+      <ion-title>Sync Device</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content padding>
-  <div class="home-container">
-    <ion-button routerLink='/login' shape="round" color="primary" fill="outline">Login</ion-button>
-    <ion-button routerLink='/about' shape="round" color="primary" fill="outline">Sign Up</ion-button>
-    <ion-button routerLink='/about' shape="round" color="primary" fill="outline">About Us</ion-button>
+  <ion-list>
+
+    <ion-item>
+      <ion-item>
+        <ion-input required type="text" placeholder="198.0.0.5"></ion-input>
+      </ion-item>
+    </ion-item>
+  </ion-list>
+
+  <div padding>
+    <ion-button shape="round" color="primary" (click)='onSync()'>Connect</ion-button>
   </div>
+
 </ion-content>
