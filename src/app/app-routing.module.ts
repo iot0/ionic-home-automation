@@ -6,8 +6,7 @@ const routes: Routes = [
   { path: "home", loadChildren: './home/home.module#HomePageModule' },
   { path: "device-list", loadChildren: './device-list/device-list.module#DeviceListPageModule' },
   { path: '', pathMatch: 'full', redirectTo: 'home' },
-  { path: 'device-list', loadChildren: './device-list/device-list.module#DeviceListPageModule' }
-  // { path: '', loadChildren: './tabs/tabs.module#TabsPageModule' }
+  { path: 'device-list/:ip', loadChildren: './device-list/device-list.module#DeviceListPageModule' }
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

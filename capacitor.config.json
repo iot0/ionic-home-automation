@@ -1,0 +1,6 @@
+{
+  "appId": "net.keephacking.iot_home_automation",
+  "appName": "iot-home-automation",
+  "bundledWebRuntime": false,
+  "webDir": "www"
+}

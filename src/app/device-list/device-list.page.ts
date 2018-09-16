@@ -1,57 +1,44 @@
-import { Component, OnInit } from "@angular/core";
-import { LoadingController,ToastController } from "@ionic/angular";
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { LoadingController, ToastController } from "@ionic/angular";
+import { DeviceService } from "../services/device.service";
+import { timer } from "rxjs";
+import { takeWhile, switchMap, catchError } from "rxjs/operators";
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   selector: "app-device-list",
   templateUrl: "./device-list.page.html",
   styleUrls: ["./device-list.page.scss"]
 })
-export class DeviceListPage implements OnInit {
-  deviceList = [];
+export class DeviceListPage implements OnInit, OnDestroy {
+  alive: boolean = true;
+  ip;
 
-  constructor(public loadingController: LoadingController,
-    public toastController: ToastController) {}
+  constructor(
+    public loadingController: LoadingController,
+    public toastController: ToastController,
+    public deviceService: DeviceService,
+    private route: ActivatedRoute
+  ) {}
 
-  ngOnInit() {
-    // this.presentLoading();
-    this.presentToast("Alert : Fan1 and Light is ON at the moment and no one inside the room .")
-    this.deviceList = [
-      {
-        Id: 1,
-        Name: "Fan1",
-        Status: "on"
-      },
-      {
-        Id: 1,
-        Name: "Fan2",
-        Status: "on"
-      },
-      {
-        Id: 1,
-        Name: "Fan3",
-        Status: "on"
-      },
-      {
-        Id: 1,
-        Name: "Fan4",
-        Status: "on"
-      },
-      {
-        Id: 7,
-        Name: "Light",
-        Status: "off"
-      },
-      {
-        Id: 1,
-        Name: "AC1",
-        Status: "on"
-      },
-      {
-        Id: 1,
-        Name: "AC2",
-        Status: "on"
+  ngOnDestroy() {
+    this.alive = false; // switches your IntervalObservable off
+    console.log("Device list destroyed");
+  }
+  ngOnInit(): void {
+    this.route.params.subscribe(param => {
+      if (param.ip) {
+        this.ip = param.ip;
+        timer(1000, 3000)
+          .pipe(
+            takeWhile(() => this.alive),
+            switchMap(x => {
+              return this.deviceService.sync(this.ip);
+            })
+          )
+          .subscribe();
       }
-    ];
+    });
   }
 
   async presentLoading() {
@@ -63,15 +50,26 @@ export class DeviceListPage implements OnInit {
   }
 
   onChangeStatus(device) {
-    if (device.Status === "on") device.Status = "off";
-    else device.Status = "on";
-
-    this.presentToast(device.Name+" is switched "+device.Status);
+    device.status=device.status==0?1:0;
+    this.deviceService
+      .update(this.ip, device)
+      .pipe(
+        catchError(err => {
+          this.presentToast("Sorry , Something went wrong .");
+          return err;
+        })
+      )
+      .subscribe(res => {
+        if (res) {
+          const status = device.status === 0 ? "OFF" : "ON";
+          this.presentToast("Light is switched " + status);
+        }
+      });
   }
   async presentToast(message) {
     const toast = await this.toastController.create({
       message: message,
-      duration: 60000
+      duration: 2000
     });
     toast.present();
   }

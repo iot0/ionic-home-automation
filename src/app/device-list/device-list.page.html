@@ -1,19 +1,21 @@
 <ion-header>
   <ion-toolbar color='tertiary'>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
     <ion-title>Devices</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
-  <ion-list>
-    <ion-item *ngFor='let device of deviceList'>
+<ion-content>
+  <ion-list padding>
+    <ion-item *ngFor='let device of deviceService.device$|async;let i=index;'>
       <ion-icon name="flash" slot="start"></ion-icon>
       <ion-label>
-        <h2>{{device.Name}}</h2>
-        <p>Status is {{device.Status}}</p>
+        <h2>LED {{i+1}}</h2>
+        <p>Status is {{device.status==0?'OFF' :'ON'}}</p>
       </ion-label>
-      <ion-toggle [checked]='device.Status==="on"' slot="end" 
-      (ionChange)='onChangeStatus(device)'></ion-toggle>
+      <ion-toggle [checked]='device.status===1' slot="end" (ionChange)='onChangeStatus(device)'></ion-toggle>
     </ion-item>
   </ion-list>
 </ion-content>
